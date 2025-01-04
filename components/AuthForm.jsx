@@ -9,6 +9,9 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
 import InputField from "./InputField";
 import ButtonComponent from "./ButtonComponent";
@@ -42,11 +45,7 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
   };
 
   return (
-    <ImageBackground
-      style={[styles.image]}
-      source={require("../assets/images/PhotoBG.png")}
-      resizeMode="cover"
-    >
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
         style={[
           styles.form,
@@ -63,12 +62,14 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
             </TouchableOpacity>
           </View>
         )}
-        <View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
           <View style={styles.container}>
             <Text style={styles.header}>
               {isLogin ? "Увійти" : "Реєстрація"}
             </Text>
-            <KeyboardAvoidingView style={styles.inputsContainer}>
+            <View style={styles.inputsContainer}>
               {!isLogin && (
                 <InputField
                   placeholder="Логін"
@@ -89,7 +90,7 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
                 value={password}
                 onChangeText={handlePasswordChange}
               />
-            </KeyboardAvoidingView>
+            </View>
 
             <ButtonComponent
               title={isLogin ? "Увійти" : "Зареєструватися"}
@@ -108,25 +109,21 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
-    </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "flex-end",
-  },
   form: {
+    minHeight: "60%",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     backgroundColor: "#fff",
     paddingLeft: 16,
     paddingRight: 16,
-    paddingBottom: 0.05 * SCREEN_HEIGHT,
+    paddingBottom: 0.07 * SCREEN_HEIGHT,
     position: "relative",
   },
   imgWrapper: {

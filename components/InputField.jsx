@@ -35,7 +35,10 @@ const InputField = ({
         <TextInput
           style={[
             styles.input,
-            { paddingVertical: isPassword ? 0 : 0.02 * SCREEN_HEIGHT },
+            {
+              paddingVertical: isPassword ? 0 : 0.02 * SCREEN_HEIGHT,
+              paddingRight: isPassword ? 0 : 16,
+            },
           ]}
           placeholder={placeholder}
           secureTextEntry={isPassword && !showPassword}
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#ddd",
-    paddingHorizontal: 16,
+    paddingLeft: 16,
   },
   input: {
     fontFamily: "Roboto-Regular",

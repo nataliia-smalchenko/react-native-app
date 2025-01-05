@@ -45,26 +45,26 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View
-        style={[
-          styles.form,
-          {
-            paddingTop: isLogin ? 0 : 60,
-          },
-        ]}
-      >
-        {!isLogin && (
-          <View style={styles.imgWrapper}>
-            <View style={[styles.square]}></View>
-            <TouchableOpacity>
-              <AddIcon style={styles.icon} />
-            </TouchableOpacity>
-          </View>
-        )}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[
+            styles.form,
+            {
+              paddingTop: isLogin ? 0 : 60,
+            },
+          ]}
         >
+          {!isLogin && (
+            <View style={styles.imgWrapper}>
+              <View style={[styles.square]}></View>
+              <TouchableOpacity>
+                <AddIcon style={styles.icon} />
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={styles.container}>
             <Text style={styles.header}>
               {isLogin ? "Увійти" : "Реєстрація"}
@@ -101,23 +101,25 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
 
           <View style={styles.toggleContainer}>
             <Text style={styles.toggleText}>
-              {isLogin ? "Немає акаунту?" : "Вже є акаунт?"}
+              {isLogin ? "Немає акаунту? " : "Вже є акаунт? "}
             </Text>
             <TouchableOpacity onPress={toggleForm}>
-              <Text style={styles.toggleText}>
-                {isLogin ? " Зареєструватися" : " Увійти"}
+              <Text
+                style={[styles.toggleText, { textDecorationLine: "underline" }]}
+              >
+                {isLogin ? "Зареєструватися" : "Увійти"}
               </Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </View>
-    </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   form: {
-    minHeight: "60%",
+    minHeight: "50%",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     backgroundColor: "#fff",

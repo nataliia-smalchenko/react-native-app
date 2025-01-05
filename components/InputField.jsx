@@ -19,10 +19,22 @@ const InputField = ({
   placeholder,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
-  // Функція для перемикання видимості пароля
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
+  };
+
+  const onFocus = () => {
+    setIsFocused(true);
+  };
+  const onBlur = () => {
+    setIsFocused(false);
+  };
+
+  const outerStyles = {
+    backgroundColor: isFocused && "#fff",
+    borderColor: isFocused && "#FF6C00",
   };
 
   return (
@@ -30,7 +42,7 @@ const InputField = ({
       {/* Мітка для поля введення */}
       {label && <Text style={styles.label}>{label}</Text>}
 
-      <View style={styles.inputWrapper}>
+      <View style={[styles.inputWrapper, isFocused && outerStyles]}>
         {/* Поле введення */}
         <TextInput
           style={[
@@ -45,6 +57,9 @@ const InputField = ({
           onChangeText={onChangeText}
           value={value}
           placeholderTextColor="#BDBDBD"
+          autoCapitalize="none"
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
 
         {/* Кнопка для показу/сховання пароля */}

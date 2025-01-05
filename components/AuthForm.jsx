@@ -37,11 +37,15 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
   };
 
   const handleSubmit = () => {
-    if (!login || !password) {
+    if (!email || !password || (!isLogin && !login)) {
       Alert.alert("Помилка", "Будь ласка, заповніть всі поля.");
       return;
     }
-    onSubmit(login, password);
+    if (isLogin) {
+      onSubmit(email, password);
+    } else {
+      onSubmit(email, password, login);
+    }
   };
 
   return (

@@ -11,13 +11,16 @@ import {
 const RegisterScreen = () => {
   const [isLogin, setIsLogin] = useState(false);
 
-  const handleFormSubmit = (login, password) => {
+  const handleFormSubmit = (email, password, login = "") => {
     if (isLogin) {
-      Alert.alert("Логін", `Вітаємо, ${login}! Ваш пароль: ${password}`);
+      Alert.alert(
+        "Логін",
+        `Вітаємо із входом! Ваш e-mail: \n${email}\n Ваш пароль: ${password}`
+      );
     } else {
       Alert.alert(
         "Реєстрація",
-        `Вітаємо, ${login}, ви зареєстровані! Ваш пароль: ${password}`
+        `Вітаємо, ${login}, ви зареєстровані!\n Ваш e-mail: ${email}\n Ваш пароль: ${password}`
       );
     }
   };

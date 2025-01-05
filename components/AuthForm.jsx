@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Alert,
-  ImageBackground,
   Image,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -13,6 +12,9 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import InputField from "./InputField";
 import ButtonComponent from "./ButtonComponent";
 import AddIcon from "../assets/icons/AddIcon";
@@ -23,6 +25,17 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [imageUri, setImageUri] = useState(null);
+
+  useEffect(() => {
+    const loadImageUri = async () => {
+      const savedUri = await AsyncStorage.getItem("imageUri");
+      if (savedUri) {
+        setImageUri(savedUri);
+      }
+    };
+    loadImageUri();
+  }, []);
 
   const handleLoginChange = (text) => {
     setLogin(text);
@@ -48,6 +61,36 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
     }
   };
 
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+      await AsyncStorage.setItem("imageUri", uri);
+    }
+  };
+
+  const dismissImage = async () => {
+    setImageUri(null);
+    await AsyncStorage.setItem("imageUri", null);
+  };
+
+  const deleteImageStyles = { transform: [{ rotate: "45deg" }] };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -63,9 +106,13 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
         >
           {!isLogin && (
             <View style={styles.imgWrapper}>
-              <View style={[styles.square]}></View>
-              <TouchableOpacity>
-                <AddIcon style={styles.icon} />
+              <Image style={[styles.square]} source={{ uri: imageUri }}></Image>
+              <TouchableOpacity onPress={!imageUri ? pickImage : dismissImage}>
+                <AddIcon
+                  style={[styles.icon, imageUri && deleteImageStyles]}
+                  plusColor={imageUri ? "#BDBDBD" : "#FF6C00"}
+                  strokeColor={imageUri ? "#E8E8E8" : "#FF6C00"}
+                />
               </TouchableOpacity>
             </View>
           )}

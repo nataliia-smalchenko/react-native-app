@@ -1,12 +1,6 @@
 import { useState } from "react";
 import AuthForm from "../components/AuthForm";
-import {
-  Alert,
-  ImageBackground,
-  Keyboard,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { Alert, ImageBackground, StyleSheet } from "react-native";
 
 const RegisterScreen = () => {
   const [isLogin, setIsLogin] = useState(false);

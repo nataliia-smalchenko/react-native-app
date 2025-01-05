@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
-import RegisterScreen from "./screen/RegisterScreen";
+import RegisterScreen from "./screens/RegisterScreen";
 
 SplashScreen.preventAutoHideAsync();
 

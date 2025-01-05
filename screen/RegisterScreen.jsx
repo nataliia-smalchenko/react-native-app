@@ -13,9 +13,12 @@ const RegisterScreen = () => {
 
   const handleFormSubmit = (login, password) => {
     if (isLogin) {
-      Alert.alert("Логін", `Вітаємо, ${login}!`);
+      Alert.alert("Логін", `Вітаємо, ${login}! Ваш пароль: ${password}`);
     } else {
-      Alert.alert("Реєстрація", `Вітаємо, ${login}, ви зареєстровані!`);
+      Alert.alert(
+        "Реєстрація",
+        `Вітаємо, ${login}, ви зареєстровані! Ваш пароль: ${password}`
+      );
     }
   };
 

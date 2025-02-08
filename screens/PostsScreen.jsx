@@ -22,6 +22,10 @@ const posts = [
     comments: 0,
     likes: 0,
     location: "Ukraine",
+    coords: {
+      latitude: 51.226933,
+      longitude: 33.193996,
+    },
   },
   {
     id: "2",
@@ -30,6 +34,10 @@ const posts = [
     comments: 3,
     likes: 3,
     location: "Ukraine",
+    coords: {
+      latitude: 50.4501,
+      longitude: 30.5234,
+    },
   },
 ];
 
@@ -59,6 +67,9 @@ const PostsScreen = ({ navigation }) => {
             post={item}
             onCommentsPress={() => {
               navigation.navigate("CommentsScreen");
+            }}
+            onLocationPress={() => {
+              navigation.navigate("MapScreen", { coords: item.coords });
             }}
           />
         )}

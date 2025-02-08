@@ -19,6 +19,10 @@ const posts = [
     comments: 0,
     likes: 0,
     location: "Ukraine",
+    coords: {
+      latitude: 51.226933,
+      longitude: 33.193996,
+    },
   },
   {
     id: "2",
@@ -27,6 +31,10 @@ const posts = [
     comments: 3,
     likes: 3,
     location: "Ukraine",
+    coords: {
+      latitude: 50.4501,
+      longitude: 30.5234,
+    },
   },
   {
     id: "3",
@@ -35,6 +43,10 @@ const posts = [
     comments: 3,
     likes: 3,
     location: "Italy",
+    coords: {
+      latitude: 43.157294,
+      longitude: 12.732021,
+    },
   },
 ];
 const ProfileScreen = ({ navigation }) => {
@@ -70,6 +82,9 @@ const ProfileScreen = ({ navigation }) => {
               }}
               style={{ marginLeft: 16, marginRight: 16 }}
               isProfile={true}
+              onLocationPress={() => {
+                navigation.navigate("MapScreen", { coords: item.coords });
+              }}
             />
           )}
           keyExtractor={(item) => item.id}

@@ -10,8 +10,9 @@ import {
   Alert,
   Pressable,
 } from "react-native";
-import { Camera, CameraView, useCameraPermissions } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
+import * as ImagePicker from "expo-image-picker";
 import TrashIcon from "../assets/icons/TrashIcon";
 import ButtonComponent from "../components/ButtonComponent";
 import CameraIcon from "../assets/icons/CameraIcon";
@@ -22,8 +23,8 @@ const CreatePostScreen = ({ navigation, route }) => {
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  // const [cameraRef, setCameraRef] = useState(null);
-  const cameraRef = useRef(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  // const cameraRef = useRef(null);
   const [photo, setPhoto] = useState(null);
   const [status, requestPermission] = useCameraPermissions();
 
@@ -64,42 +65,75 @@ const CreatePostScreen = ({ navigation, route }) => {
   }, []);
 
   const handleCapturePhoto = async () => {
-    // if (cameraRef) {
-    //   const photoData = await cameraRef.takePictureAsync();
-    //   setPhoto(photoData.uri);
-    // }
-    if (cameraRef.current) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync({
-          qualityPrioritization: "speed",
-          flash: "off",
-        });
-
-        setPhoto(photo.path);
-      } catch (error) {
-        console.error("Помилка при зйомці фото:", error);
-        let result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-
-        if (!result.canceled) {
-          setPhoto(result.assets[0].uri);
-        }
-      }
+    if (cameraRef) {
+      const photoData = await cameraRef.takePictureAsync();
+      setPhoto(photoData.uri);
     }
   };
 
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPhoto(result.assets[0].uri);
+    }
+  };
+
+  const reverseGeocode = async (latitude, longitude) => {
+    const [result] = await Location.reverseGeocodeAsync({
+      latitude,
+      longitude,
+    });
+    const name = `${result.country}, ${result.region}`
+      .trim()
+      .replace(/,\s*$/, "");
+    setLocationName(name);
+  };
+
   const handleLocationPress = async () => {
-    // let { status } = await Location.requestForegroundPermissionsAsync();
-    // if (status !== "granted") {
-    //   return;
-    // }
-    // let location = await Location.getCurrentPositionAsync({});
-    // setLocation(location.coords);
-    navigation.navigate("MapScreen");
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Доступ до місцезнаходження",
+        "Дозвіл на доступ до місцезнаходження необхідний. Будь ласка, надайте дозвіл.",
+        [
+          { text: "Скасувати", style: "cancel" },
+          {
+            text: "Надати дозвіл",
+            onPress: async () => {
+              const { status: newStatus } =
+                await Location.requestForegroundPermissionsAsync();
+              if (newStatus === "granted") {
+                const { coords } = await Location.getCurrentPositionAsync({});
+                setLocation({
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                });
+                reverseGeocode(coords.latitude, coords.longitude);
+              } else {
+                Alert.alert(
+                  "Доступ до місцезнаходження відхилено",
+                  "Ви не надали дозвіл на доступ до місцезнаходження. Спробуйте ще раз."
+                );
+              }
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    const { coords } = await Location.getCurrentPositionAsync({});
+    setLocation({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    });
+    reverseGeocode(coords.latitude, coords.longitude);
   };
 
   const handleTrashPress = () => {
@@ -118,8 +152,8 @@ const CreatePostScreen = ({ navigation, route }) => {
               {!photo ? (
                 <CameraView
                   style={styles.photoPlaceholder}
-                  // ref={(ref) => setCameraRef(ref)}
-                  ref={cameraRef}
+                  ref={(ref) => setCameraRef(ref)}
+                  // ref={cameraRef}
                 >
                   <Pressable
                     style={styles.cameraIconActive}
@@ -159,7 +193,11 @@ const CreatePostScreen = ({ navigation, route }) => {
               )}
             </>
           )}
-          <Text style={styles.uploadText}>Завантажте фото...</Text>
+          <TouchableOpacity onPress={handlePickImage}>
+            <Text style={styles.uploadText}>
+              {photo ? "Редагувати фото" : "Завантажте фото"}
+            </Text>
+          </TouchableOpacity>
         </View>
         <TextInput
           style={styles.input}
@@ -181,12 +219,15 @@ const CreatePostScreen = ({ navigation, route }) => {
         <ButtonComponent
           title="Опублікувати"
           style={{
-            backgroundColor: title && location ? "#ff6600" : "#F6F6F6",
+            backgroundColor: title && photo ? "#ff6600" : "#F6F6F6",
             marginTop: 16,
           }}
-          disabled={!title || !location}
-          color={title && location ? "#fff" : "#BDBDBD"}
-          onPress={() => navigation.navigate("Home")}
+          disabled={!title || !photo}
+          color={title && photo ? "#fff" : "#BDBDBD"}
+          onPress={async () => {
+            await handleLocationPress();
+            return navigation.navigate("Home");
+          }}
         />
       </View>
       {!isKeyboardVisible && (

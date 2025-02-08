@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,9 @@ import {
   StyleSheet,
   Keyboard,
   Alert,
+  Pressable,
 } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
 import TrashIcon from "../assets/icons/TrashIcon";
 import ButtonComponent from "../components/ButtonComponent";
@@ -21,9 +22,10 @@ const CreatePostScreen = ({ navigation, route }) => {
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [cameraRef, setCameraRef] = useState(null);
+  // const [cameraRef, setCameraRef] = useState(null);
+  const cameraRef = useRef(null);
   const [photo, setPhoto] = useState(null);
-  const [hasPermission, requestPermission] = useCameraPermissions();
+  const [status, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
     if (route.params?.selectedLocation) {
@@ -62,9 +64,31 @@ const CreatePostScreen = ({ navigation, route }) => {
   }, []);
 
   const handleCapturePhoto = async () => {
-    if (cameraRef) {
-      const photoData = await cameraRef.takePictureAsync();
-      setPhoto(photoData.uri);
+    // if (cameraRef) {
+    //   const photoData = await cameraRef.takePictureAsync();
+    //   setPhoto(photoData.uri);
+    // }
+    if (cameraRef.current) {
+      try {
+        const photo = await cameraRef.current.takePictureAsync({
+          qualityPrioritization: "speed",
+          flash: "off",
+        });
+
+        setPhoto(photo.path);
+      } catch (error) {
+        console.error("Помилка при зйомці фото:", error);
+        let result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+
+        if (!result.canceled) {
+          setPhoto(result.assets[0].uri);
+        }
+      }
     }
   };
 
@@ -78,48 +102,62 @@ const CreatePostScreen = ({ navigation, route }) => {
     navigation.navigate("MapScreen");
   };
 
+  const handleTrashPress = () => {
+    setPhoto(null);
+  };
+  useEffect(() => {
+    console.log("Photo value changed:", photo);
+  }, [photo]);
+
   return (
     <View style={styles.container}>
       <View style={styles.form}>
         <View style={styles.photoContainer}>
-          {hasPermission ? (
+          {status ? (
             <>
-              <CameraView
-                style={styles.photoPlaceholder}
-                ref={(ref) => setCameraRef(ref)}
-              >
-                <TouchableOpacity
-                  style={styles.cameraIconActive}
-                  onPress={handleCapturePhoto}
+              {!photo ? (
+                <CameraView
+                  style={styles.photoPlaceholder}
+                  // ref={(ref) => setCameraRef(ref)}
+                  ref={cameraRef}
                 >
-                  <CameraIcon fill="#fff" />
-                </TouchableOpacity>
-              </CameraView>
-              {photo && (
+                  <Pressable
+                    style={styles.cameraIconActive}
+                    onPress={handleCapturePhoto}
+                  >
+                    <CameraIcon fill="#fff" />
+                  </Pressable>
+                </CameraView>
+              ) : (
                 <Image
                   source={{ uri: photo }}
                   style={{
                     ...styles.photoPlaceholder,
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
+                    // position: "absolute",
+                    // top: 0,
+                    // left: 0,
                   }}
                 />
               )}
             </>
           ) : (
-            <View style={styles.photoPlaceholder}>
+            <>
               {photo ? (
                 <Image
                   source={{ uri: photo }}
-                  style={{ width: "100%", height: "100%" }}
-                ></Image>
+                  style={[
+                    styles.photoPlaceholder,
+                    { width: "100%", height: "100%" },
+                  ]}
+                />
               ) : (
-                <TouchableOpacity style={styles.cameraIcon}>
-                  <CameraIcon />
-                </TouchableOpacity>
+                <View style={styles.photoPlaceholder}>
+                  <TouchableOpacity style={styles.cameraIcon}>
+                    <CameraIcon />
+                  </TouchableOpacity>
+                </View>
               )}
-            </View>
+            </>
           )}
           <Text style={styles.uploadText}>Завантажте фото...</Text>
         </View>
@@ -153,10 +191,14 @@ const CreatePostScreen = ({ navigation, route }) => {
       </View>
       {!isKeyboardVisible && (
         <TouchableOpacity
-          style={styles.trashButton}
-          onPress={() => setPhoto(null)}
+          style={[
+            styles.trashButton,
+            { backgroundColor: photo === null ? "#F6F6F6" : "#FF6C00" },
+          ]}
+          onPress={handleTrashPress}
+          disabled={photo === null}
         >
-          <TrashIcon />
+          <TrashIcon color={photo === null ? "#BDBDBD" : "#FFF"} />
         </TouchableOpacity>
       )}
     </View>

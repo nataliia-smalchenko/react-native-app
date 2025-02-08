@@ -11,6 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import TrashIcon from "../assets/icons/TrashIcon";
@@ -68,6 +69,7 @@ const CreatePostScreen = ({ navigation, route }) => {
     if (cameraRef) {
       const photoData = await cameraRef.takePictureAsync();
       setPhoto(photoData.uri);
+      await MediaLibrary.saveToLibraryAsync(photoData.uri);
     }
   };
 

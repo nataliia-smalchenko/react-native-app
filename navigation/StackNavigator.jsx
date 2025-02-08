@@ -12,7 +12,7 @@ const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
         animation: "fade",

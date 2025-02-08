@@ -3,11 +3,13 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import ProfileImage from "../components/ProfileImage";
 import Post from "../components/Post";
 import { FlatList } from "react-native-gesture-handler";
+import LogoutIcon from "../assets/icons/LogoutIcon";
 
 const posts = [
   {
@@ -37,9 +39,17 @@ const posts = [
 ];
 const ProfileScreen = ({ navigation }) => {
   const renderHeader = () => (
-    <View>
+    <View style={{ position: "relative" }}>
       <ProfileImage style={{ transform: "translateX(-60%)" }} />
       <Text style={styles.header}>Natali Romanova</Text>
+      <TouchableOpacity
+        style={styles.logout}
+        onPress={() => {
+          navigation.replace("Login");
+        }}
+      >
+        <LogoutIcon />
+      </TouchableOpacity>
     </View>
   );
 
@@ -81,6 +91,11 @@ const styles = StyleSheet.create({
   },
   image: {
     ...StyleSheet.absoluteFillObject,
+  },
+  logout: {
+    position: "absolute",
+    top: 22,
+    right: 16,
   },
   header: {
     color: "#212121",

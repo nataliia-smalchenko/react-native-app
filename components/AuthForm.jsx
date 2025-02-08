@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Alert,
-  Image,
   TouchableOpacity,
   KeyboardAvoidingView,
   Dimensions,
@@ -12,12 +11,10 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import InputField from "./InputField";
 import ButtonComponent from "./ButtonComponent";
-import AddIcon from "../assets/icons/AddIcon";
+import ProfileImage from "./ProfileImage";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
@@ -25,17 +22,6 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [imageUri, setImageUri] = useState(null);
-
-  useEffect(() => {
-    const loadImageUri = async () => {
-      const savedUri = await AsyncStorage.getItem("imageUri");
-      if (savedUri) {
-        setImageUri(savedUri);
-      }
-    };
-    loadImageUri();
-  }, []);
 
   const handleLoginChange = (text) => {
     setLogin(text);
@@ -61,36 +47,6 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
     }
   };
 
-  const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      alert("Permission to access media library is required!");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImageUri(uri);
-      await AsyncStorage.setItem("imageUri", uri);
-    }
-  };
-
-  const dismissImage = async () => {
-    setImageUri(null);
-    await AsyncStorage.setItem("imageUri", null);
-  };
-
-  const deleteImageStyles = { transform: [{ rotate: "45deg" }] };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -104,18 +60,7 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
             },
           ]}
         >
-          {!isLogin && (
-            <View style={styles.imgWrapper}>
-              <Image style={[styles.square]} source={{ uri: imageUri }}></Image>
-              <TouchableOpacity onPress={!imageUri ? pickImage : dismissImage}>
-                <AddIcon
-                  style={[styles.icon, imageUri && deleteImageStyles]}
-                  plusColor={imageUri ? "#BDBDBD" : "#FF6C00"}
-                  strokeColor={imageUri ? "#E8E8E8" : "#FF6C00"}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
+          {!isLogin && <ProfileImage />}
           <View style={styles.container}>
             <Text style={styles.header}>
               {isLogin ? "Увійти" : "Реєстрація"}
@@ -134,12 +79,18 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
                 value={email}
                 onChangeText={handleEmailChange}
                 isPassword={false}
+                autoComplete="email"
+                textContentType="emailAddress"
+                importantForAutofill="yes"
               />
               <InputField
                 isPassword={true}
                 placeholder="Пароль"
                 value={password}
                 onChangeText={handlePasswordChange}
+                autoComplete="password"
+                textContentType="password"
+                importantForAutofill="yes"
               />
             </View>
 
@@ -178,29 +129,6 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingBottom: 0.07 * SCREEN_HEIGHT,
     position: "relative",
-  },
-  imgWrapper: {
-    flex: 0,
-    position: "absolute",
-    top: -60,
-    left: "50%",
-    transform: "translateX(-50%)",
-    flexDirection: "row",
-  },
-  square: {
-    flex: 0,
-    width: 120,
-    height: 120,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 16,
-  },
-  icon: {
-    flex: 0,
-    width: 25,
-    height: 25,
-    position: "absolute",
-    bottom: 14,
-    right: -12,
   },
   header: {
     color: "#212121",

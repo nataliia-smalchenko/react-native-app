@@ -17,6 +17,9 @@ const InputField = ({
   onChangeText,
   value,
   placeholder,
+  autoComplete,
+  textContentType,
+  importantForAutofill,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -60,6 +63,9 @@ const InputField = ({
           autoCapitalize="none"
           onFocus={onFocus}
           onBlur={onBlur}
+          autoComplete={autoComplete}
+          textContentType={textContentType}
+          importantForAutofill={importantForAutofill}
         />
 
         {/* Кнопка для показу/сховання пароля */}

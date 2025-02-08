@@ -1,9 +1,15 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-const ButtonComponent = ({ onPress, title, style }) => {
+const ButtonComponent = ({ onPress, title, style, disabled, color }) => {
   return (
-    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-      <Text style={styles.buttonText}>{title}</Text>
+    <TouchableOpacity
+      style={[styles.button, style]}
+      onPress={onPress}
+      disabled={disabled ? true : false}
+    >
+      <Text style={[styles.buttonText, { color: color || "#fff" }]}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -19,7 +25,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: "Roboto-Regular",
-    color: "#fff",
     fontSize: 16,
   },
 });

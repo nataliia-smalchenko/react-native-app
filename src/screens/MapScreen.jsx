@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import ButtonComponent from "../components/ButtonComponent";
+import ButtonComponent from "../../components/ButtonComponent";
 import { PROVIDER_GOOGLE } from "react-native-maps";
 
 const MapScreen = ({ navigation, route }) => {

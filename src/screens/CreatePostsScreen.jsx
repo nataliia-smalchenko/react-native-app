@@ -13,10 +13,10 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
-import TrashIcon from "../assets/icons/TrashIcon";
-import ButtonComponent from "../components/ButtonComponent";
-import CameraIcon from "../assets/icons/CameraIcon";
-import MapPinIcon from "../assets/icons/MapPinIcon";
+import TrashIcon from "../../assets/icons/TrashIcon";
+import ButtonComponent from "../../components/ButtonComponent";
+import CameraIcon from "../../assets/icons/CameraIcon";
+import MapPinIcon from "../../assets/icons/MapPinIcon";
 
 const CreatePostScreen = ({ navigation, route }) => {
   const [title, setTitle] = useState("");

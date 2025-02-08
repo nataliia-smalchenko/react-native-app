@@ -3,10 +3,10 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import ProfileScreen from "../screens/ProfileScreen";
 import CreatePostsScreen from "../screens/CreatePostsScreen";
 import PostsScreen from "../screens/PostsScreen";
-import LogoutIcon from "../assets/icons/LogoutIcon";
-import GridIcon from "../assets/icons/GridIcon";
-import PlusIcon from "../assets/icons/PlusIcon";
-import UserIcon from "../assets/icons/UserIcon";
+import LogoutIcon from "../../assets/icons/LogoutIcon";
+import GridIcon from "../../assets/icons/GridIcon";
+import PlusIcon from "../../assets/icons/PlusIcon";
+import UserIcon from "../../assets/icons/UserIcon";
 
 const Tab = createBottomTabNavigator();
 

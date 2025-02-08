@@ -3,7 +3,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import CreatePostsScreen from "../screens/CreatePostsScreen";
-import LeftArrowIcon from "../assets/icons/LeftArrowIcon";
+import LeftArrowIcon from "../../assets/icons/LeftArrowIcon";
 import { TouchableOpacity } from "react-native";
 import MapScreen from "../screens/MapScreen";
 import CommentsScreen from "../screens/CommentsScreen";

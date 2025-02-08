@@ -12,24 +12,38 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["assets/fonts/*"],
+    "assetBundlePatterns": [
+      "assets/fonts/*"
+    ],
     "ios": {
       "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyDB3mgvtZpLySkpy0YghykxuwDlGzLiGgs"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location.",
-
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app requires access to your location even when closed.",
         "NSLocationAlwaysUsageDescription": "This app requires access to your location when open.",
         "NSCameraUsageDescription": "This app requires access to your camera when open.",
         "NSMediaLibraryUsageDescription": "This app requires access to your camera when open."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.AwesomeProject"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["ACCESS_FINE_LOCATION", "CAMERA"]
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDB3mgvtZpLySkpy0YghykxuwDlGzLiGgs"
+        }
+      },
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

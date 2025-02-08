@@ -139,9 +139,10 @@ const CreatePostScreen = ({ navigation, route }) => {
   const handleTrashPress = () => {
     setPhoto(null);
   };
-  useEffect(() => {
-    console.log("Photo value changed:", photo);
-  }, [photo]);
+
+  // useEffect(() => {
+  //   console.log("Photo value changed:", photo);
+  // }, [photo]);
 
   return (
     <View style={styles.container}>
@@ -318,9 +319,9 @@ const styles = StyleSheet.create({
   },
   trashButton: {
     position: "absolute",
-    bottom: 56,
+    bottom: 32,
     left: "50%",
-    transform: [{ translateX: "-35%" }],
+    transform: [{ translateX: -20 }],
     alignItems: "center",
     backgroundColor: "#F6F6F6",
     borderRadius: 20,

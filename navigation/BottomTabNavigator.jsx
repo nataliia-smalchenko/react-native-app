@@ -26,7 +26,8 @@ const BottomTabNavigator = () => {
         tabBarStyle: {
           paddingHorizontal: "15%",
           paddingTop: 12,
-          height: 80,
+          paddingBottom: 24,
+          height: 76,
         },
       })}
     >

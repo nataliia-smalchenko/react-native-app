@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import ButtonComponent from "../components/ButtonComponent";
+import { PROVIDER_GOOGLE } from "react-native-maps";
 
 const MapScreen = ({ navigation, route }) => {
   const coords = route?.params?.coords;
@@ -11,13 +12,16 @@ const MapScreen = ({ navigation, route }) => {
       {coords ? (
         <MapView
           style={styles.map}
+          provider={PROVIDER_GOOGLE}
           initialRegion={{
             ...coords,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}
         >
-          <Marker coordinate={coords} />
+          {coords && coords.latitude && coords.longitude && (
+            <Marker coordinate={coords} />
+          )}
         </MapView>
       ) : (
         <Text>Завантаження...</Text>

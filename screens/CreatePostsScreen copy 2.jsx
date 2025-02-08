@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,23 +7,22 @@ import {
   TouchableOpacity,
   StyleSheet,
   Keyboard,
-  Alert,
+  Platform,
 } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import * as Location from "expo-location";
 import TrashIcon from "../assets/icons/TrashIcon";
 import ButtonComponent from "../components/ButtonComponent";
 import CameraIcon from "../assets/icons/CameraIcon";
 import MapPinIcon from "../assets/icons/MapPinIcon";
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 
 const CreatePostScreen = ({ navigation, route }) => {
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState("");
   const [locationName, setLocationName] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [cameraRef, setCameraRef] = useState(null);
-  const [photo, setPhoto] = useState(null);
-  const [hasPermission, requestPermission] = useCameraPermissions();
+  const [image, setImage] = useState(null);
+  const cameraRef = useRef(null);
 
   useEffect(() => {
     if (route.params?.selectedLocation) {
@@ -46,82 +45,73 @@ const CreatePostScreen = ({ navigation, route }) => {
       }
     );
 
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera permissions to make this work!");
+        }
+      }
+    })();
+
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
   }, [route.params?.selectedLocation, route.params?.locationName]);
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await requestPermission();
-      if (status !== "granted") {
-        Alert.alert("Permission to access camera was denied");
-      }
-    })();
-  }, []);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  const handleCapturePhoto = async () => {
-    if (cameraRef) {
-      const photoData = await cameraRef.takePictureAsync();
-      setPhoto(photoData.uri);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
-  const handleLocationPress = async () => {
-    // let { status } = await Location.requestForegroundPermissionsAsync();
-    // if (status !== "granted") {
-    //   return;
-    // }
-    // let location = await Location.getCurrentPositionAsync({});
-    // setLocation(location.coords);
+  const handleLocationPress = () => {
     navigation.navigate("MapScreen");
+  };
+
+  const handlePublish = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Location permission not granted");
+        return;
+      }
+
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation.coords); // Set the location object
+
+      // You can now use the location (currentLocation.coords)
+      console.log("Location:", currentLocation.coords);
+
+      navigation.navigate("Home"); // Navigate after getting location
+    } catch (error) {
+      console.error("Error getting location:", error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.form}>
         <View style={styles.photoContainer}>
-          {hasPermission ? (
-            <>
-              <CameraView
-                style={styles.photoPlaceholder}
-                ref={(ref) => setCameraRef(ref)}
-              >
-                <TouchableOpacity
-                  style={styles.cameraIconActive}
-                  onPress={handleCapturePhoto}
-                >
-                  <CameraIcon fill="#fff" />
-                </TouchableOpacity>
-              </CameraView>
-              {photo && (
-                <Image
-                  source={{ uri: photo }}
-                  style={{
-                    ...styles.photoPlaceholder,
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                  }}
-                />
-              )}
-            </>
-          ) : (
-            <View style={styles.photoPlaceholder}>
-              {photo ? (
-                <Image
-                  source={{ uri: photo }}
-                  style={{ width: "100%", height: "100%" }}
-                ></Image>
-              ) : (
-                <TouchableOpacity style={styles.cameraIcon}>
-                  <CameraIcon />
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-          <Text style={styles.uploadText}>Завантажте фото...</Text>
+          <TouchableOpacity style={styles.photoPlaceholder} onPress={pickImage}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.photoPlaceholder} />
+            ) : (
+              <CameraIcon />
+            )}
+          </TouchableOpacity>
+
+          <Text style={styles.uploadText}>
+            {image ? "Змінити фото" : "Завантажте фото..."}
+          </Text>
         </View>
         <TextInput
           style={styles.input}
@@ -135,6 +125,7 @@ const CreatePostScreen = ({ navigation, route }) => {
         >
           <Text style={[styles.input, styles.locationInput]}>
             {locationName || "Місцевість..."}
+            {/* `${location.latitude}, ${location.longitude}` */}
           </Text>
           <View style={styles.locationIcon}>
             <MapPinIcon />
@@ -142,19 +133,22 @@ const CreatePostScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <ButtonComponent
           title="Опублікувати"
-          style={{
-            backgroundColor: title && location ? "#ff6600" : "#F6F6F6",
-            marginTop: 16,
-          }}
+          style={[
+            {
+              backgroundColor: title && location ? "#ff6600" : "#F6F6F6",
+              marginTop: 16,
+            },
+          ]}
           disabled={!title || !location}
           color={title && location ? "#fff" : "#BDBDBD"}
-          onPress={() => navigation.navigate("Home")}
+          // onPress={() => navigation.navigate("Home")}
+          onPress={handlePublish}
         />
       </View>
       {!isKeyboardVisible && (
         <TouchableOpacity
           style={styles.trashButton}
-          onPress={() => setPhoto(null)}
+          onPress={() => navigation.navigate("Home")}
         >
           <TrashIcon />
         </TouchableOpacity>
@@ -204,7 +198,7 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#ffffff4d",
+    backgroundColor: "#FFFFFF4D",
     borderRadius: 30,
   },
   uploadText: {
@@ -239,6 +233,7 @@ const styles = StyleSheet.create({
     left: "50%",
     transform: [{ translateX: "-35%" }],
     alignItems: "center",
+    marginTop: 16,
     backgroundColor: "#F6F6F6",
     borderRadius: 20,
     paddingHorizontal: 23,

@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Keyboard,
-  Alert,
 } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import TrashIcon from "../assets/icons/TrashIcon";
 import ButtonComponent from "../components/ButtonComponent";
@@ -21,11 +20,16 @@ const CreatePostScreen = ({ navigation, route }) => {
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [photo, setPhoto] = useState(null);
-  const [hasPermission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+
     if (route.params?.selectedLocation) {
       setLocation(route.params.selectedLocation);
     }
@@ -52,15 +56,6 @@ const CreatePostScreen = ({ navigation, route }) => {
     };
   }, [route.params?.selectedLocation, route.params?.locationName]);
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await requestPermission();
-      if (status !== "granted") {
-        Alert.alert("Permission to access camera was denied");
-      }
-    })();
-  }, []);
-
   const handleCapturePhoto = async () => {
     if (cameraRef) {
       const photoData = await cameraRef.takePictureAsync();
@@ -69,13 +64,12 @@ const CreatePostScreen = ({ navigation, route }) => {
   };
 
   const handleLocationPress = async () => {
-    // let { status } = await Location.requestForegroundPermissionsAsync();
-    // if (status !== "granted") {
-    //   return;
-    // }
-    // let location = await Location.getCurrentPositionAsync({});
-    // setLocation(location.coords);
-    navigation.navigate("MapScreen");
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location.coords);
   };
 
   return (
@@ -83,37 +77,24 @@ const CreatePostScreen = ({ navigation, route }) => {
       <View style={styles.form}>
         <View style={styles.photoContainer}>
           {hasPermission ? (
-            <>
-              <CameraView
-                style={styles.photoPlaceholder}
-                ref={(ref) => setCameraRef(ref)}
+            <Camera
+              style={styles.photoPlaceholder}
+              ref={(ref) => setCameraRef(ref)}
+            >
+              <TouchableOpacity
+                style={styles.cameraIcon}
+                onPress={handleCapturePhoto}
               >
-                <TouchableOpacity
-                  style={styles.cameraIconActive}
-                  onPress={handleCapturePhoto}
-                >
-                  <CameraIcon fill="#fff" />
-                </TouchableOpacity>
-              </CameraView>
-              {photo && (
-                <Image
-                  source={{ uri: photo }}
-                  style={{
-                    ...styles.photoPlaceholder,
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                  }}
-                />
-              )}
-            </>
+                <CameraIcon />
+              </TouchableOpacity>
+            </Camera>
           ) : (
             <View style={styles.photoPlaceholder}>
               {photo ? (
                 <Image
                   source={{ uri: photo }}
                   style={{ width: "100%", height: "100%" }}
-                ></Image>
+                />
               ) : (
                 <TouchableOpacity style={styles.cameraIcon}>
                   <CameraIcon />
@@ -154,7 +135,7 @@ const CreatePostScreen = ({ navigation, route }) => {
       {!isKeyboardVisible && (
         <TouchableOpacity
           style={styles.trashButton}
-          onPress={() => setPhoto(null)}
+          onPress={() => navigation.navigate("Home")}
         >
           <TrashIcon />
         </TouchableOpacity>
@@ -199,14 +180,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 30,
   },
-  cameraIconActive: {
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ffffff4d",
-    borderRadius: 30,
-  },
   uploadText: {
     color: "#BDBDBD",
     fontSize: 16,
@@ -227,11 +200,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     top: 12,
-  },
-  locationInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   trashButton: {
     position: "absolute",

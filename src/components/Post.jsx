@@ -8,27 +8,27 @@ import {
   View,
 } from "react-native";
 
-import ThumbUpIcon from "../assets/icons/ThumbUpIcon";
-import MessageIcon from "../assets/icons/MessageIcon";
-import MapPinIcon from "../assets/icons/MapPinIcon";
+import ThumbUpIcon from "../../assets/icons/ThumbUpIcon";
+import MessageIcon from "../../assets/icons/MessageIcon";
+import MapPinIcon from "../../assets/icons/MapPinIcon";
 
 const Post = ({ post, isProfile, onCommentsPress, style, onLocationPress }) => {
   return (
     <View style={[styles.container, style]}>
       <Image
         style={styles.image}
-        // source={{ uri: post.image }}
-        source={require("../assets/images/PhotoBG.png")}
+        source={{ uri: post.imageUrl }}
+        // source={require("../../assets/images/PhotoBG.png")}
       />
-      <Text style={styles.caption}>{post.caption}</Text>
+      <Text style={styles.caption}>{post.title}</Text>
       <View style={styles.postFooter}>
         <View style={styles.commentsLikes}>
           <TouchableOpacity style={styles.likes} onPress={onCommentsPress}>
             <MessageIcon
-              fill={post.comments ? "#FF6C00" : "none"}
-              stroke={post.comments ? "#FF6C00" : "#BDBDBD"}
+              fill={post.comments.length ? "#FF6C00" : "none"}
+              stroke={post.comments.length ? "#FF6C00" : "#BDBDBD"}
             />
-            <Text style={styles.commentsIcon}>{post.comments}</Text>
+            <Text style={styles.commentsIcon}>{post.comments.length}</Text>
           </TouchableOpacity>
           {isProfile && (
             <View style={styles.likes}>
@@ -40,9 +40,9 @@ const Post = ({ post, isProfile, onCommentsPress, style, onLocationPress }) => {
         <TouchableOpacity style={styles.likes} onPress={onLocationPress}>
           <MapPinIcon />
           <Text style={styles.locationText}>
-            {post.location.length > 35
-              ? post.location.slice(0, 32) + "..."
-              : post.location}
+            {post.locationName.length > 35
+              ? post.locationName.slice(0, 32) + "..."
+              : post.locationName}
           </Text>
         </TouchableOpacity>
       </View>

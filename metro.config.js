@@ -1,8 +1,9 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-import { getDefaultConfig } from "expo/metro-config";
+const { getDefaultConfig } = require("expo/metro-config");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
-config.resolver.assetExts.push("cjs");
+const defaultConfig = getDefaultConfig(__dirname);
+// defaultConfig.resolver.assetExts.push("cjs", "js", "json", "ts", "tsx");
+defaultConfig.resolver.sourceExts.push("cjs", "js", "json", "ts", "tsx");
 
-export default config;
+module.exports = defaultConfig;

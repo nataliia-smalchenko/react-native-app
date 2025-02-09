@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   FlatList,
@@ -9,51 +8,27 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
   Dimensions,
 } from "react-native";
 import Comment from "../components/Comment";
-import UpArrowIcon from "../assets/icons/UpArrowIcon";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import UpArrowIcon from "../../assets/icons/UpArrowIcon";
+import { useSelector } from "react-redux";
+import { addCommentToPost } from "../utils/firestore";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
-const CommentsScreen = () => {
-  const [comments, setComments] = useState([
-    {
-      id: "1",
-      username: "User1",
-      userImage:
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/new-year-background-736885_1280.jpg",
-      text: "Really love your most recent photo. I've been trying to capture the same thing for a few months and would love some tips!",
-      timestamp: "09 червня, 2020 | 08:40",
-    },
-    {
-      id: "2",
-      username: "CurrentUser",
-      userImage:
-        "https://cdn.pixabay.com/photo/2023/12/08/07/27/woman-8437007_1280.jpg",
-      text: "A fast 50mm like f1.8 would help with the bokeh. I've been using primes as they tend to get a bit sharper images.",
-      timestamp: "09 червня, 2020 | 09:14",
-    },
-    {
-      id: "3",
-      username: "User1",
-      userImage:
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/new-year-background-736885_1280.jpg",
-      text: "Thank you! That was very helpful!",
-      timestamp: "09 червня, 2020 | 09:20",
-    },
-  ]);
+const CommentsScreen = ({ route }) => {
+  const user = useSelector((state) => state.user.userInfo);
+  const post = route?.params?.post;
+  const [comments, setComments] = useState(post.comments);
   const [newComment, setNewComment] = useState("");
 
-  const addComment = () => {
+  const addComment = async () => {
     if (newComment.trim()) {
       const newCommentObj = {
-        id: (comments.length + 1).toString(),
-        username: "CurrentUser",
-        userImage:
-          "https://cdn.pixabay.com/photo/2023/12/08/07/27/woman-8437007_1280.jpg",
+        uid: Date.now(),
+        userUid: user.uid,
+        userImage: user.profilePhoto,
         text: newComment,
         timestamp: new Date().toLocaleString("uk-UA", {
           day: "2-digit",
@@ -65,22 +40,19 @@ const CommentsScreen = () => {
       };
       setComments([...comments, newCommentObj]);
       setNewComment("");
+      await addCommentToPost(post.uid, user.uid, newCommentObj);
     }
   };
 
   return (
     <View style={styles.container}>
       <>
-        <Image
-          // source={{ uri: "https://example.com/sunset.jpg" }}
-          source={require("../assets/images/PhotoBG.png")}
-          style={styles.image}
-        />
+        <Image source={{ uri: post.imageUrl }} style={styles.image} />
         <FlatList
           data={comments}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.uid}
           renderItem={({ item }) => (
-            <Comment item={item} ownComment={item.username == "CurrentUser"} />
+            <Comment item={item} ownComment={item.userUid == user.uid} />
           )}
           contentContainerStyle={styles.list}
         />
@@ -109,7 +81,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingVertical: 32,
+    paddingVertical: 0,
   },
   image: {
     marginHorizontal: 16,
@@ -120,8 +92,9 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    // paddingVertical: 16,
     gap: 24,
+    paddingVertical: 32,
   },
   inputContainer: {
     flexDirection: "row",

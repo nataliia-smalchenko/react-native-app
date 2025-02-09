@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import AddIcon from "../assets/icons/AddIcon";
+import AddIcon from "../../assets/icons/AddIcon";
+import { useSelector } from "react-redux";
 
-const ProfileImage = ({ style }) => {
-  const [imageUri, setImageUri] = useState(null);
+const ProfileImage = ({ style, profilePhoto }) => {
+  const [imageUri, setImageUri] = useState(profilePhoto || null);
 
   useEffect(() => {
-    const loadImageUri = async () => {
-      const savedUri = await AsyncStorage.getItem("imageUri");
-      if (savedUri) {
-        setImageUri(savedUri);
-      }
-    };
-    loadImageUri();
+    if (!profilePhoto) {
+      const loadImageUri = async () => {
+        const savedUri = await AsyncStorage.getItem("imageUri");
+        if (savedUri) {
+          setImageUri(savedUri);
+        }
+      };
+      loadImageUri();
+    }
   }, []);
 
   const pickImage = async () => {
@@ -41,7 +44,29 @@ const ProfileImage = ({ style }) => {
     }
   };
 
+  // const handleImageUpload = async (userId, file, fileName) => {
+  //   try {
+  //     console.log("FILE", file);
+  //     const imageRef = await uploadImage(userId, file, fileName);
+
+  //     const imageUrl = await getImageUrl(imageRef);
+
+  //     console.log("Image URL:", imageUrl);
+  //     return imageUrl;
+  //   } catch (error) {
+  //     console.error("Error uploading image and getting URL:", error);
+  //   }
+  // };
+
   const dismissImage = async () => {
+    // console.log("DISMISIMAGE", profilePhoto);
+    if (profilePhoto) {
+      Alert.alert(
+        "Спробуйте пізніше",
+        "Вибачте, даний функціонал поки що не працює, але обовʼязково буде працювати після наступних оновлень."
+      );
+      return;
+    }
     setImageUri(null);
     await AsyncStorage.setItem("imageUri", null);
   };

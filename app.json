@@ -12,9 +12,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "assets/fonts/*"
-    ],
+    "assetBundlePatterns": ["assets/fonts/*"],
     "ios": {
       "supportsTablet": true,
       "config": {
@@ -43,7 +41,7 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

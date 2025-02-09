@@ -15,6 +15,7 @@ import {
 import InputField from "./InputField";
 import ButtonComponent from "./ButtonComponent";
 import ProfileImage from "./ProfileImage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
@@ -35,7 +36,7 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
     setEmail(text);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!email || !password || (!isLogin && !login)) {
       Alert.alert("Помилка", "Будь ласка, заповніть всі поля.");
       return;
@@ -43,7 +44,18 @@ const AuthForm = ({ isLogin, onSubmit, toggleForm }) => {
     if (isLogin) {
       onSubmit(email, password);
     } else {
-      onSubmit(email, password, login);
+      const imageUri = await AsyncStorage.getItem("imageUri");
+
+      const response = await fetch(imageUri);
+      const file = await response.blob();
+
+      const fileName = imageUri.split("/").pop() || "123";
+      console.log("FILENAME", fileName);
+      const fileType = file.type;
+
+      const imageFile = new File([file], fileName, { type: fileType });
+
+      onSubmit(email, password, login, imageFile, fileName);
     }
   };
 

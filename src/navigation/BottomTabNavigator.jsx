@@ -7,10 +7,14 @@ import LogoutIcon from "../../assets/icons/LogoutIcon";
 import GridIcon from "../../assets/icons/GridIcon";
 import PlusIcon from "../../assets/icons/PlusIcon";
 import UserIcon from "../../assets/icons/UserIcon";
+import { useDispatch } from "react-redux";
+import { logoutDB } from "../utils/auth";
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  const dispatch = useDispatch();
+
   return (
     <Tab.Navigator
       screenOptions={() => ({
@@ -35,11 +39,13 @@ const BottomTabNavigator = () => {
         name="PostsScreen"
         component={PostsScreen}
         options={({ navigation }) => ({
+          sceneStyle: { backgroundColor: "#fff" },
           title: "Публікації",
           headerRight: () => (
             <TouchableOpacity
               onPress={() => {
-                navigation.replace("Login");
+                // navigation.replace("Login");
+                logoutDB(dispatch);
               }}
             >
               <LogoutIcon />

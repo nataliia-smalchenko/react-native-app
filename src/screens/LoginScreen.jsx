@@ -1,9 +1,13 @@
 import AuthForm from "../components/AuthForm";
 import { Alert, ImageBackground, StyleSheet } from "react-native";
 import { validateEmail, validatePassword } from "../helpers/validators";
+import { loginDB } from "../utils/auth";
+import { useDispatch } from "react-redux";
 
 const LoginScreen = ({ navigation }) => {
-  const handleFormSubmit = (email, password) => {
+  const dispatch = useDispatch();
+
+  const handleFormSubmit = async (email, password) => {
     if (!validateEmail(email)) {
       Alert.alert("Помилка входу", "Некоректний email");
       return;
@@ -17,11 +21,7 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    // Alert.alert(
-    //   "Логін",
-    //   `Вітаємо із входом! Ваш e-mail: \n${email}\n Ваш пароль: ${password}`
-    // );
-    navigation.replace("Home");
+    await loginDB({ email, password }, dispatch);
   };
 
   const toggleForm = () => {
@@ -31,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <ImageBackground
       style={[styles.image]}
-      source={require("../assets/images/PhotoBG.png")}
+      source={require("../../assets/images/PhotoBG.png")}
       resizeMode="cover"
     >
       <AuthForm

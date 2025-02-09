@@ -1,81 +1,77 @@
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Post from "../components/Post";
+import React, { useEffect, useState, useCallback } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-
-const user = {
-  name: "Natali Romanova",
-  email: "email@example.com",
-  imagePath: "../assets/images/PhotoBG.png",
-};
-const posts = [
-  {
-    id: "1",
-    image: "https://example.com/forest.jpg",
-    caption: "Ліс",
-    comments: 0,
-    likes: 0,
-    location: "Ukraine",
-    coords: {
-      latitude: 51.226933,
-      longitude: 33.193996,
-    },
-  },
-  {
-    id: "2",
-    image: "https://example.com/sunset.jpg",
-    caption: "Захід на Чорному морі",
-    comments: 3,
-    likes: 3,
-    location: "Ukraine",
-    coords: {
-      latitude: 50.4501,
-      longitude: 30.5234,
-    },
-  },
-];
+import Post from "../components/Post";
+import { useSelector } from "react-redux";
+import { getAllPosts } from "../utils/firestore";
+import { useFocusEffect } from "@react-navigation/native";
 
 const PostsScreen = ({ navigation }) => {
+  const user = useSelector((state) => state.user.userInfo);
+  const [posts, setPosts] = useState([]);
+
+  const fetchPosts = async () => {
+    if (user?.uid) {
+      const userPosts = await getAllPosts(user.uid);
+      setPosts(userPosts);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [user?.uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [])
+  );
+
   const renderHeader = () => (
     <View style={styles.userInfo}>
       <Image
         style={styles.userImage}
-        source={require("../assets/images/PhotoBG.png")}
-        // source={{ uri: user.imagePath }}
-        // source={{ uri: imageUri }}
+        source={{ uri: user?.profilePhoto }}
         resizeMode="cover"
       />
       <View>
-        <Text style={styles.userName}>{user.name}</Text>
-        <Text style={styles.userEmail}>{user.email}</Text>
+        <Text style={styles.userName}>{user?.displayName}</Text>
+        <Text style={styles.userEmail}>{user?.email}</Text>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        ,
+        {
+          flex: posts.length ? 0 : 1,
+        },
+      ]}
+    >
       <FlatList
         data={posts}
         renderItem={({ item }) => (
           <Post
             post={item}
             onCommentsPress={() => {
-              navigation.navigate("CommentsScreen");
+              navigation.navigate("CommentsScreen", { post: item });
             }}
             onLocationPress={() => {
-              navigation.navigate("MapScreen", { coords: item.coords });
+              navigation.navigate("MapScreen", { coords: item.location });
             }}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.uid}
         ListHeaderComponent={renderHeader}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          {
+            flex: posts.length ? 0 : 1,
+          },
+        ]}
       />
     </View>
   );
@@ -91,7 +87,6 @@ const styles = StyleSheet.create({
     gap: 8,
     alignItems: "center",
     marginBottom: 12,
-    paddingHorizontal: 16,
   },
   userImage: {
     width: 60,
@@ -119,6 +114,7 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
     paddingBottom: 32,
+    backgroundColor: "#fff",
   },
 });
 

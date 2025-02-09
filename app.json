@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["assets/fonts/*"],
+    "assetBundlePatterns": [
+      "assets/fonts/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "config": {
@@ -42,6 +44,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
+      "package": "com.anonymous.AwesomeProject"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -60,6 +63,11 @@
           "cameraPermission": "Allow access to your camera"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1dc0f8d6-1213-4822-801d-6b6bd6fc0f34"
+      }
+    }
   }
 }

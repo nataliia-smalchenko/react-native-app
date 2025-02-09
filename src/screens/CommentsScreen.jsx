@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingVertical: 0,
+    paddingTop: 32,
+    paddingBottom: 16,
   },
   image: {
     marginHorizontal: 16,
@@ -92,9 +93,8 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 16,
-    // paddingVertical: 16,
+    paddingVertical: 16,
     gap: 24,
-    paddingVertical: 32,
   },
   inputContainer: {
     flexDirection: "row",

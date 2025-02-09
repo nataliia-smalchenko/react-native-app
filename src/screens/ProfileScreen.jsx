@@ -43,9 +43,9 @@ const ProfileScreen = ({ navigation }) => {
     <View style={{ position: "relative" }}>
       <ProfileImage
         style={{ transform: "translateX(-60%)" }}
-        profilePhoto={user.profilePhoto}
+        profilePhoto={user?.profilePhoto}
       />
-      <Text style={styles.header}>{user.displayName}</Text>
+      <Text style={styles.header}>{user?.displayName}</Text>
       <TouchableOpacity
         style={styles.logout}
         onPress={() => {

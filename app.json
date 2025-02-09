@@ -27,7 +27,8 @@
         "NSCameraUsageDescription": "This app requires access to your camera when open.",
         "NSMediaLibraryUsageDescription": "This app requires access to your camera when open."
       },
-      "bundleIdentifier": "com.anonymous.AwesomeProject"
+      "bundleIdentifier": "com.anonymous.AwesomeProject",
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +45,10 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.AwesomeProject"
+      "package": "com.anonymous.AwesomeProject",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -68,6 +72,9 @@
       "eas": {
         "projectId": "1dc0f8d6-1213-4822-801d-6b6bd6fc0f34"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1dc0f8d6-1213-4822-801d-6b6bd6fc0f34"
     }
   }
 }
